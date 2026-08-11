@@ -30,13 +30,13 @@ To generate results of Table 1 and 2
 
 ```bash
 python Table_1_Rossler_Parallel.py
-'''
+```
 
 To generate results of Table 4 
 
-'''
+```bash
 python Table_2_Rossler_sensitive_analysis.py
-'''
+```
 
 
 
