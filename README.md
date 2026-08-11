@@ -6,7 +6,7 @@ Duan Y, Zhang Z, Guo Y. Wasserstein Geometry of Information Loss in Nonlinear Dy
 
 ## Usage
 
-To generate results of CCM and plot Figure 1 and 3, please run Figure1_CCM_Experiments.ipynb. 
+To generate results of CCM and plot Figure 1 and 3, please run the notebook Figure1_CCM_Experiments.ipynb. 
 
 To generate results of Table 1,  
 
