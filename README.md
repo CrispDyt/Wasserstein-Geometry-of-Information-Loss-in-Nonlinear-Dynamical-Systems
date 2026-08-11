@@ -28,7 +28,9 @@ Since our estimator is based on k-NN, which can be parallelly implemented, we us
 
 To generate results of Table 1 and 2
 
-'python Table_1_Rossler_Parallel.py'
+```bash
+python Table_1_Rossler_Parallel.py
+'''
 
 To generate results of Table 4 
 
