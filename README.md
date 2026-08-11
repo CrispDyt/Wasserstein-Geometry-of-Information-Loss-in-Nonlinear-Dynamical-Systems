@@ -1,18 +1,7 @@
 # Wasserstein Geometry of Information Loss in Nonlinear Dynamical Systems
 
-This repository accompanies:
+Code relating to the PRSA Paper 
 
-Y. Duan et al.
-Proceedings of the Royal Society A (2026)
+Duan Y, Zhang Z, Guo Y. Wasserstein Geometry of Information Loss in Nonlinear Dynamical Systems[J]. arXiv preprint arXiv:2601.22814, 2026.
 
-## Installation
-
-pip install -r requirements.txt
-
-## Quick Start
-
-python scripts/figure1.py
-
-## Reproducing the Paper
-
-See REPRODUCIBILITY.md
+## Usage
