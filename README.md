@@ -12,15 +12,11 @@ Stady_Data.mat_Final_Result_17_9_5_4.996.mat: double pendulum trajectories
 
 ## Usage for Main Figures and Plots.
 
-To generate results of CCM and plot Figure 1 and 3, please run the notebook Figure1_CCM_Experiments.ipynb. 
-
-To generate results of Figure 2, please run the notebook Figure2.ipynb.
-
-To generate results of Figure 5, please run the notebook Figure5_Double.ipynb and Figure5_Measles.ipynb. 
-
-To generate results of Figure 6 (EDMD), please run the notebook Figure6_Downstream_EDMD.ipynb. 
-
-To generate results of Figure 7, please run the notebook Figure7_Downstream_DIM.ipynb and plot Figure 7 please run Figure7_Plot_DIM.ipynb. 
+- Figures 1 and 3 (CCM): run Figure1_CCM_Experiments.ipynb.
+- Figure 2: run Figure2.ipynb.
+- Figure 5: run Figure5_Double.ipynb and Figure5_Measles.ipynb.
+- Figure 6 (EDMD): run Figure6_Downstream_EDMD.ipynb.
+- Figure 7: run Figure7_Downstream_DIM.ipynb to generate the results, and then run Figure7_Plot_DIM.ipynb to reproduce the figure.
 
 ## Usage for Tables 
 
