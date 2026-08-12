@@ -20,7 +20,7 @@ Stady_Data.mat_Final_Result_17_9_5_4.996.mat: double pendulum trajectories
 
 ## Usage for Tables 
 
-Since our estimator is based on k-NN, which can be parallelly implemented, we use the jit function from the numba package. 
+Since our estimator is based on k-NN and can be efficiently parallelized, we use the jit function from the Numba package to accelerate the computation.
 
 To generate results of Table 1 and 2
 
