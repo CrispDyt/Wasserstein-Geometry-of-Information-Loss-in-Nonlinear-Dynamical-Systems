@@ -16,10 +16,6 @@ except Exception:  # pragma: no cover
     Parallel = None
     delayed = None
 
-# ---------------------------------------------------------------------
-# Rössler system and differential coordinate maps
-# ---------------------------------------------------------------------
-
 def rossler(xyz, *, a=0.2, b=0.2, c=5.7):
     x, y, z = xyz
     return np.array([-y - z, x + a * y, b + z * (x - c)], dtype=np.float64)
@@ -104,11 +100,6 @@ def build_embeddings_from_y(y_arr: np.ndarray) -> Dict[str, np.ndarray]:
         "x_plus_z": rossler_dm_zx(x, y, z).T,
         "x_plus_y": rossler_dm_xy(x, y, z).T,
     }
-
-
-# ---------------------------------------------------------------------
-# Numba kernels
-# ---------------------------------------------------------------------
 
 @jit(nopython=True, fastmath=True)
 def compute_errors_numba(neighbor_clouds, max_iter=50, eps=1e-5):
@@ -217,11 +208,6 @@ def compute_baselines_numba(neighbor_clouds, query_futures):
 
     return cond_var_trace, pred_error, mean_dispersion, pair_dispersion
 
-
-# ---------------------------------------------------------------------
-# Utility functions
-# ---------------------------------------------------------------------
-
 def simulate_rossler(num_steps: int, dt: float) -> np.ndarray:
     y_clean = np.zeros((num_steps + 1, 3), dtype=np.float64)
     y_clean[0] = np.array([1.0, 1.0, 0.0], dtype=np.float64)
@@ -277,7 +263,6 @@ def select_knn_indices(
     n_q = int(min(n_samples, max_start))
     query_idx = rng.choice(max_start, size=n_q, replace=False)
 
-    # Query extra neighbours because Theiler exclusion may remove many candidates.
     k_query = int(min(max_start, max(k * buffer_mult, k + 2 * theiler_w + 5)))
     nbrs = NearestNeighbors(n_neighbors=k_query, algorithm="auto", n_jobs=1).fit(X_curr)
     dist_raw, idx_raw = nbrs.kneighbors(X_curr[query_idx])
@@ -413,11 +398,6 @@ def write_csv(path: Path, rows: List[Dict[str, Any]], fieldnames: List[str]) -> 
         for row in rows:
             writer.writerow({key: row.get(key, "") for key in fieldnames})
 
-
-# ---------------------------------------------------------------------
-# Sensitivity experiment
-# ---------------------------------------------------------------------
-
 def make_sensitivity_configs() -> List[Dict[str, Any]]:
     """One-at-a-time sensitivity around the baseline setting.
 
@@ -448,7 +428,6 @@ def make_sensitivity_configs() -> List[Dict[str, Any]]:
     for noise in [0.0, 0.01, 0.05, 0.10]:
         add("noise", f"noise={noise:g}", noise_level=noise)
 
-    # Remove exact duplicate baseline rows created inside one-at-a-time sweeps.
     seen = set()
     unique = []
     for cfg in configs:
@@ -564,7 +543,7 @@ def main() -> None:
     COND_THRESHOLD = 1000.0
     BUFFER_MULT = 6
     STRICT_THEILER = True
-    N_REPEATS = 10  # increase to 30 if you want the appendix sensitivity table to match the main table
+    N_REPEATS = 10  
     N_JOBS = -1
 
     output_dir = Path("rossler_sensitivity_outputs")
@@ -575,7 +554,7 @@ def main() -> None:
     embeddings_order = list(embeddings.keys())
     configs = make_sensitivity_configs()
 
-    # Warm-up numba once.
+    # warm up 
     dummy_cloud = np.random.default_rng(123).normal(size=(2, 50, 3))
     dummy_future = np.random.default_rng(456).normal(size=(2, 3))
     _ = compute_errors_numba(dummy_cloud)
@@ -599,7 +578,6 @@ def main() -> None:
             for e, d, c, r in tasks
         )
 
-    # Sort rows for readable CSV.
     config_order = {cfg["config"]: i for i, cfg in enumerate(configs)}
     embedding_order = {e: i for i, e in enumerate(embeddings_order)}
     all_rows.sort(key=lambda r: (config_order[r["config"]], embedding_order[r["embedding"]], int(r["repeat"])))

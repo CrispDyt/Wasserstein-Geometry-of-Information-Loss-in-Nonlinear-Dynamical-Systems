@@ -12,14 +12,9 @@ from sklearn.preprocessing import RobustScaler
 
 try:
     from joblib import Parallel, delayed
-except Exception:  # pragma: no cover
+except Exception: 
     Parallel = None
     delayed = None
-
-
-# ---------------------------------------------------------------------
-# Rössler system and differential coordinate maps
-# ---------------------------------------------------------------------
 
 def rossler(xyz, *, a=0.2, b=0.2, c=5.7):
     x, y, z = xyz
@@ -149,10 +144,6 @@ def build_embeddings_from_y(y_arr: np.ndarray) -> Dict[str, np.ndarray]:
     }
 
 
-# ---------------------------------------------------------------------
-# Numerical kernels
-# ---------------------------------------------------------------------
-
 @jit(nopython=True, fastmath=True)
 def compute_errors_numba(neighbor_clouds, max_iter=50, eps=1e-5):
     """Pointwise geometric-median loss for each future cloud."""
@@ -255,7 +246,7 @@ def compute_baselines_numba(neighbor_clouds, query_futures):
                 s += cloud[j, d]
             centroid[d] = s / k
 
-        # Conditional variance trace and mean distance to centroid.
+        # Conditional variance trace 
         var_sum = 0.0
         dist_sum = 0.0
         for j in range(k):
@@ -268,7 +259,7 @@ def compute_baselines_numba(neighbor_clouds, query_futures):
         cond_var_trace[i] = var_sum / k
         mean_dispersion[i] = dist_sum / k
 
-        # Local-constant prediction error for the query future.
+        # Local-constant prediction error 
         pred_sq = 0.0
         for d in range(dim):
             diff = query_futures[i, d] - centroid[d]
@@ -289,11 +280,6 @@ def compute_baselines_numba(neighbor_clouds, query_futures):
         pair_dispersion[i] = pair_sum / pair_count
 
     return cond_var_trace, pred_error, mean_dispersion, pair_dispersion
-
-
-# ---------------------------------------------------------------------
-# Estimator and baselines
-# ---------------------------------------------------------------------
 
 def check_embedding_condition(data: np.ndarray) -> float:
     data_centered = data - np.mean(data, axis=0)
@@ -506,11 +492,6 @@ def write_csv(path: Path, rows: List[Dict[str, Any]], fieldnames: List[str]) -> 
         for row in rows:
             writer.writerow({key: row.get(key, "") for key in fieldnames})
 
-
-# ---------------------------------------------------------------------
-# Main experiment
-# ---------------------------------------------------------------------
-
 def main() -> None:
     # Experiment parameters.
     DT = 0.01
@@ -522,13 +503,12 @@ def main() -> None:
     THEILER_W = 30
     BUFFER_MULT = 6
     N_REPEATS = 30
-    N_JOBS = -1  # set to an integer such as 8 if you want to limit CPU use
+    N_JOBS = -1 
     STRICT_THEILER = True
 
     output_dir = Path("rossler_baseline_outputs")
     output_dir.mkdir(exist_ok=True)
 
-    # Simulate Rössler trajectory using the same Euler step as your current script.
     y_clean = np.zeros((NUM_STEPS + 1, 3), dtype=np.float64)
     y_clean[0] = np.array([1.0, 1.0, 0.0], dtype=np.float64)
     for i in range(NUM_STEPS):
@@ -536,7 +516,6 @@ def main() -> None:
 
     embeddings_clean = build_embeddings_from_y(y_clean)
 
-    # Robust-scale once per embedding. All metrics then use the same scaled coordinates.
     scaled_embeddings: Dict[str, Tuple[np.ndarray, float, bool]] = {}
     for name, emb in embeddings_clean.items():
         data_norm = robust_scale_embedding(emb)
@@ -546,7 +525,6 @@ def main() -> None:
             warnings.warn(f"{name}: rank deficient or ill-conditioned; cond={cond_num}")
         scaled_embeddings[name] = (data_norm, cond_num, rank_ok)
 
-    # Warm up numba once in the parent process. Worker processes may still compile once.
     dummy_cloud = np.random.default_rng(123).normal(size=(2, K, 3))
     dummy_future = np.random.default_rng(456).normal(size=(2, 3))
     _ = compute_errors_numba(dummy_cloud)
@@ -615,7 +593,6 @@ def main() -> None:
             )
         all_run_rows.extend(run_rows)
 
-    # Keep output in the original embedding order.
     order = list(embeddings_clean.keys())
     all_run_rows.sort(key=lambda r: (order.index(r["embedding"]), int(r["repeat"])))
 
@@ -640,7 +617,6 @@ def main() -> None:
             row[f"{metric}_std"] = std
         summary_rows.append(row)
 
-    # Write CSV files.
     run_fields = [
         "embedding", "repeat", "status", "condition_number", "E_star_k",
         "CondVar", "PredErr", "MeanDisp", "NeighborDisp",
@@ -653,7 +629,6 @@ def main() -> None:
     write_csv(output_dir / "rossler_baseline_all_runs.csv", all_run_rows, run_fields)
     write_csv(output_dir / "rossler_baseline_summary_30runs.csv", summary_rows, summary_fields)
 
-    # Print compact table.
     print("\n30-repeat summary. All metrics are computed in robust-scaled coordinates.")
     print(
         f"{'Embedding':<12} | {'Valid':<7} | {'E*':<17} | {'CondVar':<17} | "
